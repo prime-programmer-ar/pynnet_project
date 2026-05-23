@@ -1,0 +1,294 @@
+Metadata-Version: 2.4
+Name: pynnet
+Version: 0.0.2
+Summary: A simple neural network library built from scratch in Python ensuring easy application and understanding of artificial neural networks.
+Home-page: https://github.com/prime-programmer-ar/pynnet_project.git
+Author: Zain Qamar
+Author-email: zainqamarch@gmail.com
+License: CC-BY-NC-SA-4.0
+Classifier: Development Status :: 3 - Alpha
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: Other/Proprietary License
+Classifier: Operating System :: OS Independent
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy>=1.20.0
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: license
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# PyNNet: A Pythonic Neural Network Library
+
+[![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+[![Python Version](https://img.shields.io/badge/python-3.7%2B-blue)](https://www.python.org/downloads/)
+[![Development Status](https://img.shields.io/badge/status-alpha-orange)]()
+
+Welcome to PyNNet! 👋 
+
+PyNNet is a beginner-friendly neural network library that helps you learn and understand deep learning from the ground up. Built in pure Python and NumPy, it provides a clean, intuitive API similar to popular frameworks while being transparent about what's happening under the hood.
+
+🎯 **Perfect for:**
+- Learning how neural networks work
+- Experimenting with deep learning concepts
+- Educational projects and assignments
+- Small to medium-sized machine learning tasks
+
+🚀 **Why Choose PyNNet?**
+- Simple, Keras-like API that's easy to learn
+- Clear, documented implementation you can understand
+- Minimal dependencies (just NumPy!)
+- Great for learning deep learning fundamentals
+
+## 📚 Getting Started
+
+### Installation
+
+Install PyNNet using pip:
+```bash
+pip install pynnet
+```
+
+### Quick Start Guide
+
+Building a neural network with PyNNet is as simple as 1-2-3:
+
+1. **Create a model**:
+```python
+from pynnet.network import sequential
+model = Sequential()
+```
+
+2. **Add layers**:
+```python
+from pynnet.layers import dense
+from pynnet.activation import relu, sigmoid
+
+# Input layer with ReLU activation
+model.add(dense(input_size=2, output_size=4, weight_init='he'))
+model.add(relu)
+
+# Output layer with Sigmoid activation
+model.add(dense(input_size=4, output_size=1, weight_init='xavier'))
+model.add(sigmoid)
+```
+
+3. **Compile and train**:
+```python
+from pynnet.optimizer import Adam
+from pynnet.loss import mse, mse_derivative
+
+# Compile the model
+model.compile(
+    loss=mse,
+    loss_derivative=mse_derivative,
+    optimizer=Adam(learning_rate=0.01)
+)
+
+# Train the model
+model.fit(x_train, y_train, epochs=1000, verbose=True)
+```
+
+## 🎓 Learning by Example
+
+We provide several example implementations to help you get started:
+
+### 1. XOR Gate (`examples/01_xor_example.py`)
+Learn how to create your first neural network by implementing the XOR logic gate. This is a perfect starting point for beginners!
+
+```python
+# XOR Truth Table:
+# Input  Output
+# 0 0 => 0
+# 0 1 => 1
+# 1 0 => 1
+# 1 1 => 0
+```
+
+### 2. Binary Classification (`examples/02_binary_classification.py`)
+Learn how to classify points into two categories using a simple dataset of concentric circles. Great for understanding:
+- Binary classification problems
+- Using multiple layers
+- Working with 2D input data
+
+### 3. Regression (`examples/03_regression.py`)
+Learn how to predict continuous values by fitting a sine wave. Demonstrates:
+- Regression problems
+- Using different activation functions
+- Handling continuous output
+- Data visualization
+
+## 🛠 Features
+
+### Network Types
+- `Sequential`: Build networks by stacking layers one after another
+
+### Layers
+- `Dense`: Fully connected layer with customizable features:
+  - **Weight Initialization**:
+    - `'he'`: Best for ReLU activation (default)
+    - `'xavier'`: Best for tanh/sigmoid
+    - `'lecun'`: For normalized inputs
+    - `'identity'`: For deep networks
+    - `'orthogonal'`: For better training
+    - `'random'`: Simple random initialization
+  - **Bias Initialization**:
+    - `'zeros'`: All zeros (default)
+    - `'ones'`: All ones
+    - `'random'`: Random values
+    - `'constant'`: Custom value
+
+### Activation Functions
+- `relu`: Rectified Linear Unit
+- `sigmoid`: Sigmoid function (0 to 1)
+- `tanh`: Hyperbolic tangent (-1 to 1)
+- `linear`: No transformation (for regression)
+
+### Optimizers
+- `SGD`: Stochastic Gradient Descent
+- `Adam`: Adaptive Moment Estimation
+
+### Loss Functions
+- `mse`: Mean Squared Error (for regression)
+- `binary_cross_entropy`: For binary classification
+
+## 💡 Tips for Success
+
+### Choosing Layer Sizes
+- **Input Layer**: Must match your data's feature count
+- **Hidden Layers**: Generally start with powers of 2 (e.g., 32, 64, 128)
+- **Output Layer**: 
+  - Binary classification: 1 unit with sigmoid
+  - Regression: 1 unit with linear activation
+  - Multi-class: One unit per class with softmax
+
+### Picking Initialization Methods
+- **With ReLU**: Use `'he'` initialization
+- **With Sigmoid/Tanh**: Use `'xavier'` initialization
+- **Deep Networks**: Try `'orthogonal'` initialization
+- **When in Doubt**: Start with `'he'` initialization
+
+### Training Tips
+1. **Start Small**: Begin with a simple network and gradually add complexity
+2. **Monitor Loss**: Use `verbose=True` to watch training progress
+3. **Learning Rate**: 
+   - Start with 0.01
+   - If loss is unstable: decrease it
+   - If learning is slow: increase it
+4. **Save Your Models**: Use `model.save_weights()` to save progress
+
+### Common Patterns
+
+**Binary Classification**:
+```python
+model = Sequential()
+model.add(Dense(input_size=n_features, output_size=64, weight_init='he'))
+model.add(relu)
+model.add(Dense(input_size=64, output_size=1, weight_init='xavier'))
+model.add(sigmoid)
+```
+
+**Regression**:
+```python
+model = Sequential()
+model.add(dense(input_size=n_features, output_size=64, weight_init='he'))
+model.add(relu)
+model.add(dense(input_size=64, output_size=1, weight_init='he'))
+model.add(linear)
+```
+
+## 🚀 Advanced Features
+
+### Model Persistence
+Save and load your trained models:
+```python
+# Save model weights
+model.save_weights('my_model.npz')
+
+# Load model weights
+model.load_weights('my_model.npz')
+```
+
+### Custom Training Loop
+Monitor and control the training process:
+```python
+for epoch in range(n_epochs):
+    loss = model.fit(X, y, epochs=1, verbose=False)
+    if epoch % 100 == 0:
+        predictions = model.predict(X_test)
+        print(f"Epoch {epoch}: Loss = {loss:.4f}")
+```
+
+## 📂 Project Structure
+
+```
+pynnet/
+├── layers/         # Neural network layer implementations
+│   ├── base.py    # Base layer class
+│   └── dense.py   # Dense layer implementation
+├── activation.py   # Activation functions
+├── loss.py        # Loss functions
+├── network.py     # Core neural network implementation
+├── optimizer.py   # Optimization algorithms
+└── test.py        # Unit tests
+```
+
+## 🤝 Getting Help
+
+- Check the examples in the `examples/` directory
+- Review the docstrings in the code
+- Create an issue on GitHub
+- Send an email to the author
+
+## Requirements
+
+- Python 3.7 or higher
+- NumPy >= 1.20.0
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License - see the [LICENSE](LICENSE) file for details.
+
+## Author
+
+- **Zain Qamar** - [GitHub](https://github.com/prime-programmer-ar/pynnet_project.git)
+- Email: zainqamarch@gmail.com
+
+## Acknowledgments
+
+- Thanks to all contributors who help improve this library
+- Special thanks to the NumPy community for providing the foundation for numerical computations
+
+## Citation
+
+If you use PyNNet in your research, please cite it as:
+
+```bibtex
+@software{pynnet2025,
+  author = {Qamar, Zain},
+  title = {PyNNet: A Pythonic Neural Network Library},
+  year = {2025},
+  publisher = {GitHub},
+  url = {https://github.com/prime-programmer-ar/pynnet_project.git}
+}
+```
