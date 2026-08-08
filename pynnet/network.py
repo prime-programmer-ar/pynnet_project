@@ -80,6 +80,10 @@ class sequential:
         Returns:
             np.ndarray: Array of predictions.
         """
+        # Auto-reshape 2D input (num_samples, features) to 3D (num_samples, 1, features)
+        if input_data.ndim == 2:
+            input_data = input_data.reshape(input_data.shape[0], 1, input_data.shape[1])
+
         num_samples = len(input_data)
         results = []
 
@@ -91,8 +95,40 @@ class sequential:
 
         return np.array(results)
 
+    def evaluate(self, x_test, y_test):
+        """Evaluate the model on unseen test data.
+
+        Args:
+            x_test (np.ndarray): Test inputs of shape
+                ``(num_samples, ...)``.
+            y_test (np.ndarray): Test targets of shape
+                ``(num_samples, ...)``.
+
+        Returns:
+            float: The average loss on the test data.
+
+        Raises:
+            ValueError: If the model has not been compiled.
+        """
+        if self.loss is None:
+            raise ValueError(
+                "Loss function is not set. Call model.compile(...) before evaluating."
+            )
+
+        if x_test.ndim == 2:
+            x_test = x_test.reshape(x_test.shape[0], 1, x_test.shape[1])
+        if y_test.ndim == 2:
+            y_test = y_test.reshape(y_test.shape[0], 1, y_test.shape[1])
+
+        preds = self.predict(x_test)
+        total_error = 0.0
+        for i in range(len(x_test)):
+            total_error += self.loss(y_test[i], preds[i])
+
+        return total_error / len(x_test)
+
     def fit(self, x_train, y_train, epochs, learning_rate=None,
-            verbose=True, print_every=100):
+            validation_data=None, verbose=True, print_every=100):
         """Train the model for a fixed number of epochs (online / SGD-style).
 
         Each sample is fed individually (stochastic gradient descent).
@@ -106,12 +142,28 @@ class sequential:
             epochs (int): Number of full passes over the dataset.
             learning_rate (float, optional): If provided, overrides the
                 optimizer's current learning rate.
+            validation_data (tuple, optional): Tuple ``(x_val, y_val)`` of
+                validation data.
             verbose (bool): Whether to print progress.
             print_every (int): Print frequency (in epochs).
 
         Raises:
             ValueError: If the model has not been compiled.
         """
+        # Auto-reshape 2D inputs/targets (num_samples, features) to 3D (num_samples, 1, features)
+        if x_train.ndim == 2:
+            x_train = x_train.reshape(x_train.shape[0], 1, x_train.shape[1])
+        if y_train.ndim == 2:
+            y_train = y_train.reshape(y_train.shape[0], 1, y_train.shape[1])
+
+        if validation_data is not None:
+            x_val, y_val = validation_data
+            if x_val.ndim == 2:
+                x_val = x_val.reshape(x_val.shape[0], 1, x_val.shape[1])
+            if y_val.ndim == 2:
+                y_val = y_val.reshape(y_val.shape[0], 1, y_val.shape[1])
+            validation_data = (x_val, y_val)
+
         # Pre-training checks
         if self.optimizer is None:
             raise ValueError(
@@ -167,9 +219,18 @@ class sequential:
                            (epoch + 1) % print_every == 0 or
                            (epoch + 1) == epochs):
                 elapsed = time.time() - start_time
-                print(f"Epoch {epoch + 1}/{epochs} | "
-                      f"Error: {average_error:.6f} | "
-                      f"Time: {elapsed:.2f}s")
+                msg = (f"Epoch {epoch + 1}/{epochs} | "
+                       f"Error: {average_error:.6f} | "
+                       f"Time: {elapsed:.2f}s")
+                if validation_data is not None:
+                    x_val, y_val = validation_data
+                    val_preds = self.predict(x_val)
+                    val_error = 0.0
+                    for v_idx in range(len(x_val)):
+                        val_error += self.loss(y_val[v_idx], val_preds[v_idx])
+                    val_error /= len(x_val)
+                    msg += f" | Val Error: {val_error:.6f}"
+                print(msg)
 
         print(f"Training complete. Final Error: {average_error:.6f}")
 

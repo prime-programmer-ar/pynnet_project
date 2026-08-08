@@ -424,3 +424,26 @@ class TestEndToEnd:
 
 if __name__ == '__main__':
     pytest.main([__file__, '-v'])
+
+# ======================================================================
+# 12. METRICS TESTS
+# ======================================================================
+
+class TestMetrics:
+    def test_accuracy_binary(self):
+        from pynnet.metrics import accuracy
+        y_true = np.array([[0], [1], [1], [0]])
+        y_pred = np.array([[0.1], [0.9], [0.8], [0.4]])
+        assert accuracy(y_true, y_pred) == 1.0
+
+        y_pred_bad = np.array([[0.9], [0.1], [0.1], [0.9]])
+        assert accuracy(y_true, y_pred_bad) == 0.0
+
+    def test_accuracy_categorical(self):
+        from pynnet.metrics import accuracy
+        y_true = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+        y_pred = np.array([[0.8, 0.1, 0.1], [0.2, 0.7, 0.1], [0.3, 0.3, 0.4]])
+        assert accuracy(y_true, y_pred) == 1.0
+
+        y_pred_bad = np.array([[0.1, 0.8, 0.1], [0.7, 0.2, 0.1], [0.4, 0.3, 0.3]])
+        assert accuracy(y_true, y_pred_bad) == 0.0
